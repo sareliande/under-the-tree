@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under the Tree</title>
+<meta name="description" content="Our family Christmas wishlist. Find a gift, shop it, and mark it purchased so nobody doubles up.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Under the Tree">
+<meta property="og:description" content="Our family Christmas wishlist. Find a gift, shop it, and mark it purchased so nobody doubles up.">
+<meta property="og:image" content="preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#F3ECDF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one centered column on textured paper; header with countdown, person tabs and filters,
+   then one section of photo cards per person. One light look for everyone: pine ink, cream cards, gold and holly accents. */
+:root {
+  --paper: #F3ECDF; --card: #FFFCF6; --pad: #FFFFFF; --ink: #1F3B2D; --muted: #56675B; --gold: #87671C; --gold-bright: #C9A24B;
+  --holly: #A3262A; --leaf: #2F6B45; --line: #E3D9C7; --btn: #1F3B2D; --btn-fg: #FFFCF6; --chip: #EAE1D0;
+  --overlay: rgba(31,59,45,0.78); --shadow: rgba(60,45,20,0.28); --danger: #9B2C2C;
+  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--paper); }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5;
+  background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.wrap { max-width: 1168px; margin: 0 auto; padding: 44px max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 28px; }
+
+/* Header */
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.intro { display: flex; flex-direction: column; gap: 10px; max-width: 640px; min-width: 0; }
+.eyebrow { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(54px, 10vw, 88px); line-height: 0.95; letter-spacing: -0.01em; text-wrap: balance; }
+h1 em { color: var(--leaf); font-family: 'Great Vibes', 'Snell Roundhand', 'Apple Chancery', cursive; font-style: normal; font-size: 1.28em; line-height: 0.8; letter-spacing: 0; padding-left: 0.04em; }
+.intro p { margin: 0; font-size: 17px; color: var(--muted); max-width: 52ch; }
+.side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.countdown { display: flex; align-items: baseline; gap: 8px; font-size: 14px; color: var(--muted); }
+.countdown strong { font-family: var(--display); font-weight: 400; font-size: 40px; line-height: 1; color: var(--holly); font-variant-numeric: tabular-nums; }
+.who-chip { display: flex; align-items: center; gap: 10px; min-height: 48px; background: var(--btn); color: var(--btn-fg); border: 0; border-radius: 999px; padding: 8px 18px 8px 8px; font-size: 14px; text-align: left; }
+.who-chip .av { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-bright); color: var(--ink); display: grid; place-items: center; font-weight: 700; }
+
+/* Toolbar */
+.toolbar { display: flex; flex-direction: column; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+.tabs-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; padding: 2px; mask-image: linear-gradient(to right, #000 92%, transparent); }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 15px; font-weight: 500; white-space: nowrap; }
+.tab[aria-pressed="true"] { background: var(--btn); color: var(--btn-fg); border-color: var(--btn); }
+.tab .n { opacity: 0.6; margin-left: 6px; font-variant-numeric: tabular-nums; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.chip { min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 14px; font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--chip); color: var(--ink); border-color: var(--chip); font-weight: 600; }
+.filters .spacer { flex: 1 1 auto; }
+.sort { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.sort select { min-height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); padding: 0 10px; color: var(--ink); }
+.count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.primary { min-height: 44px; padding: 0 20px; border-radius: 12px; border: 0; background: var(--btn); color: var(--btn-fg); font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.ghost { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-weight: 500; font-size: 14px; }
+.add-btn { flex: none; }
+
+/* Sections and cards */
+.section { display: flex; flex-direction: column; gap: 16px; }
+.section-head { display: flex; align-items: baseline; gap: 12px; }
+.section-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 38px; line-height: 1; }
+.section-head span { font-size: 14px; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 22px; }
+.card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 14px 30px -24px var(--shadow); min-width: 0; transition: transform .18s ease, box-shadow .18s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 20px 36px -24px var(--shadow); }
+.photo { position: relative; display: block; aspect-ratio: 1 / 1; max-width: 100%; background: var(--pad); overflow: hidden; border-bottom: 1px solid var(--line); text-decoration: none; }
+.photo img { position: absolute; inset: 14px; width: calc(100% - 28px); height: calc(100% - 28px); object-fit: contain; display: block; }
+.photo .ph { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: 64px; font-style: italic; color: var(--muted); opacity: 0.45; }
+.go { position: absolute; right: 12px; top: 12px; width: 40px; height: 40px; border-radius: 50%; background: var(--card); color: var(--ink); display: grid; place-items: center; box-shadow: 0 3px 10px var(--shadow); transition: transform .15s ease; }
+a.photo:hover .go { transform: translate(2px, -2px); }
+.badges { position: absolute; left: 10px; top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; background: var(--card); color: var(--ink); font-size: 12px; font-weight: 600; padding: 5px 10px 5px 6px; border-radius: 999px; box-shadow: 0 2px 8px var(--shadow); }
+.badge.fav { color: var(--holly); }
+.badge.mine { padding-left: 10px; }
+.done { position: absolute; inset: 0; background: var(--overlay); color: var(--btn-fg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.done span { font-family: var(--display); font-size: 30px; font-style: italic; }
+.body { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+.meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.card h3 { margin: 2px 0 0; font-family: var(--display); font-weight: 400; font-size: 25px; line-height: 1.1; overflow-wrap: anywhere; text-wrap: balance; }
+.store { font-size: 13px; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; width: fit-content; }
+.store:hover { color: var(--ink); text-decoration: underline; }
+.note { margin: 4px 0 0; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.qty { margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--leaf); }
+.actions { margin-top: auto; padding-top: 14px; display: flex; gap: 8px; }
+.actions > * { flex: 1 1 0; }
+
+.more { align-self: center; }
+.empty { border: 1px dashed var(--line); border-radius: 20px; padding: 48px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--card); }
+.empty h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 34px; }
+.empty p { margin: 0; color: var(--muted); max-width: 46ch; }
+
+/* Loading preview */
+.skel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.skel .sp { aspect-ratio: 1 / 1; background: var(--chip); }
+.skel .sl { height: 14px; margin: 16px; border-radius: 7px; background: var(--chip); }
+.skel .sl.short { width: 50%; margin-top: 0; }
+.skel .sp, .skel .sl { animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* Dialogs */
+dialog { border: 0; border-radius: 22px; padding: 0; background: var(--card); color: var(--ink); width: min(540px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 30px 80px -30px rgba(0,0,0,0.5); }
+dialog::backdrop { background: rgba(20,30,22,0.55); }
+.dlg { padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+.dlg h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 36px; line-height: 1; }
+.dlg p { margin: 0; color: var(--muted); font-size: 15px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label, .field .lbl { font-size: 13px; font-weight: 600; }
+.field .hint { font-size: 12px; color: var(--muted); }
+.field input, .field select, .field textarea { min-height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--pad); padding: 10px 14px; width: 100%; }
+.field textarea { min-height: 72px; resize: vertical; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > .field { flex: 1 1 130px; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; font-weight: 500; }
+.check input { width: 20px; height: 20px; accent-color: var(--holly); }
+.drop { border: 1.5px dashed var(--line); border-radius: 14px; min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px; text-align: center; color: var(--muted); font-size: 14px; background: var(--pad); }
+.drop.over { border-color: var(--gold-bright); }
+.drop img { max-height: 170px; max-width: 100%; border-radius: 10px; }
+.linkish { background: none; border: 0; color: var(--ink); text-decoration: underline; padding: 4px; min-height: 32px; font-weight: 600; }
+.people { display: flex; flex-wrap: wrap; gap: 8px; }
+.people button { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--pad); font-weight: 500; }
+.people button[aria-pressed="true"] { background: var(--btn); color: var(--btn-fg); border-color: var(--btn); }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.error { color: var(--danger); font-size: 14px; }
+.danger { color: var(--danger); border-color: var(--danger); }
+
+/* Toast with undo */
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 14px; background: var(--btn); color: var(--btn-fg); padding: 10px 12px 10px 20px; border-radius: 999px; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.4); max-width: calc(100vw - 32px); }
+.toast button { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,252,246,0.4); background: transparent; color: var(--btn-fg); font-weight: 700; }
+.toast:not(.has-undo) { padding-right: 20px; }
+.status { font-size: 14px; color: var(--muted); }
+
+
+/* Title ribbon and bow */
+h1.titled { position: relative; align-self: flex-start; margin: 0 0 18px; width: min(640px, 100%); line-height: 0; }
+h1.titled .title-img { display: block; width: 100%; height: auto; }
+h1.titled .title-text { position: relative; z-index: 1; }
+h1.titled .ribbon { position: absolute; left: -8px; right: 30px; bottom: -14px; height: 10px; border-radius: 2px; background: linear-gradient(#B8403A, #A3262A 60%, #8F1F24); box-shadow: 0 3px 6px -2px rgba(80,20,20,0.35); }
+h1.titled .title-bow { position: absolute; right: -4px; bottom: -46px; width: 78px; height: 78px; transform-origin: 50% 40%; animation: bowDrop .7s .2s cubic-bezier(.3,1.6,.5,1) both; }
+h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 3px 4px rgba(80,20,20,0.3)); }
+
+/* Header extras: sound toggle and Wrapped button */
+.side-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.icon-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--muted); font-size: 13px; font-weight: 600; }
+.icon-btn[aria-pressed="true"] { color: var(--holly); border-color: var(--holly); }
+.wrapped-btn { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--holly); color: #FFFCF6; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+.share-btn { margin-left: auto; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--muted); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.share-btn:hover { color: var(--ink); }
+
+/* Wrapping paper: purchased gifts and the claim moment */
+.paper { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, #A3262A 0 14px, #B33A33 14px 28px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.paper::before, .paper::after { content: ""; position: absolute; background: #F1DFB8; box-shadow: 0 0 0 1px rgba(201,162,75,0.6); }
+.paper::before { top: 0; bottom: 0; left: 50%; width: 20px; margin-left: -10px; }
+.paper::after { left: 0; right: 0; top: 50%; height: 20px; margin-top: -10px; }
+.paper .bow { position: relative; z-index: 1; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25)); }
+.paper-label { position: relative; z-index: 1; background: var(--card); color: var(--holly); font-family: var(--display); font-style: italic; font-size: 20px; padding: 2px 14px; border-radius: 999px; }
+.paper.wrapping { animation: wrapIn .55s cubic-bezier(.3,.7,.2,1) both; }
+.paper.wrapping .bow { animation: bowDrop .65s .45s cubic-bezier(.3,1.6,.5,1) both; }
+.paper.wrapping .paper-label { animation: bowDrop .4s .8s ease both; }
+@keyframes wrapIn { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+@keyframes bowDrop { from { transform: translateY(-90px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.card.claiming { transform: scale(1.03); box-shadow: 0 24px 40px -20px var(--shadow); }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
+.confetti i { position: absolute; width: 8px; height: 12px; border-radius: 2px; }
+
+/* Wishlist Wrapped stories */
+.wrapped { position: fixed; inset: 0; z-index: 40; background: rgba(15,22,17,0.85); display: grid; place-items: center; padding: 16px; }
+.story { position: relative; width: min(420px, 100%, calc((100vh - 32px) * 9 / 16)); aspect-ratio: 9 / 16; border-radius: 28px; overflow: hidden; box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.story[data-tone="pine"] { background-color: #1F3B2D; color: #FFFCF6; }
+.story[data-tone="holly"] { background-color: #A3262A; color: #FFFCF6; }
+.story[data-tone="gold"] { background-color: #D9B25C; color: #1F3B2D; }
+.story[data-tone="paper"] { background-color: #F3ECDF; color: #1F3B2D; }
+.bars { position: absolute; top: 16px; left: 16px; right: 60px; display: flex; gap: 4px; z-index: 2; }
+.bars i { flex: 1; height: 3px; border-radius: 2px; background: currentColor; opacity: 0.3; }
+.bars i.on { opacity: 1; }
+.story-close { position: absolute; top: 4px; right: 8px; z-index: 3; width: 44px; height: 44px; border: 0; background: transparent; color: inherit; font-size: 30px; line-height: 1; }
+.story-nav { position: absolute; top: 0; bottom: 0; width: 45%; border: 0; background: transparent; z-index: 1; padding: 0; }
+.story-nav.prev { left: 0; } .story-nav.next { right: 0; }
+.slide { position: absolute; inset: 0; padding: 64px 28px 56px; display: flex; flex-direction: column; justify-content: center; gap: 14px; animation: slideIn .45s ease both; }
+.slide .kick { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.85; }
+.slide .big { font-family: var(--display); font-size: clamp(46px, 13vw, 66px); line-height: 0.95; overflow-wrap: anywhere; }
+.slide .mid { font-family: var(--display); font-size: 32px; line-height: 1.05; overflow-wrap: anywhere; }
+.slide p { margin: 0; font-size: 16px; opacity: 0.9; }
+.slide .pic { width: 66%; aspect-ratio: 1 / 1; background: #fff; border-radius: 18px; padding: 12px; align-self: center; transform: rotate(-3deg); box-shadow: 0 16px 30px -12px rgba(0,0,0,0.45); }
+.slide .pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.slide .foot { position: absolute; left: 28px; right: 28px; bottom: 22px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; display: flex; justify-content: space-between; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.share-url { font-size: 14px; }
+
+/* Phones: pinned add button */
+@media (max-width: 640px) {
+  .side { align-items: flex-start; }
+  .add-btn { position: fixed; z-index: 15; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); min-height: 54px; padding: 0 22px; border-radius: 999px; box-shadow: 0 12px 28px -10px rgba(0,0,0,0.45); }
+  .toast { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+  .section-head h2 { font-size: 32px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+  .card h3 { font-size: 21px; }
+  .body { padding: 12px 12px 14px; }
+  .go { width: 34px; height: 34px; right: 8px; top: 8px; }
+  .actions { flex-direction: column; }
+  .actions > * { white-space: nowrap; padding: 0 10px; font-size: 14px; }
+  .meta { flex-direction: column; gap: 2px; }
+  .badge { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="intro">
+      <div class="eyebrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg>
+        All of us, one list · 2026
+      </div>
+      <h1 class="titled"><img class="title-img" src="title.png" alt="Under the Tree" width="1400" height="366"><span class="ribbon" aria-hidden="true"></span></h1>
+      <p>Find someone's list, tap a gift to shop for it, then mark it purchased so nobody doubles up.</p>
+    </div>
+    <div class="side">
+      <div class="side-top">
+        <div class="countdown" id="countdown" aria-live="polite"></div>
+        <button class="icon-btn" id="soundBtn" type="button" aria-pressed="false"></button>
+      </div>
+      <button class="wrapped-btn" id="wrappedBtn" type="button" hidden>Open Wishlist Wrapped</button>
+      <button class="who-chip" id="whoChip" type="button">
+        <span class="av" id="whoAv">?</span>
+        <span id="whoText">Tell us who you are</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="tabs-row">
+      <nav class="tabs" aria-label="Whose list" id="tabs"></nav>
+      <button class="primary add-btn" id="addBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Add a wish
+      </button>
+    </div>
+    <div class="filters">
+      <div style="display:flex;flex-wrap:wrap;gap:8px" role="group" aria-label="Price" id="priceChips"></div>
+      <span class="spacer"></span>
+      <span class="count" id="count"></span>
+      <label class="sort" for="sortSel">Sort
+        <select id="sortSel">
+          <option value="new">Newest</option>
+          <option value="fav">Most wanted first</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <p class="status" id="status" hidden></p>
+  <div id="list" style="display:flex;flex-direction:column;gap:40px"></div>
+</div>
+
+<dialog id="whoDlg" aria-labelledby="whoTitle">
+  <form class="dlg" id="whoForm" method="dialog">
+    <h2 id="whoTitle">Who's shopping?</h2>
+    <p>Pick your name so we can keep your own gifts a surprise. This device will stay set to you, and switching later takes the family PIN.</p>
+    <div class="people" id="whoPeople"></div>
+    <div class="field">
+      <label for="newPerson">Not listed? Add your name</label>
+      <input id="newPerson" maxlength="40" autocomplete="given-name" placeholder="Your first name">
+    </div>
+    <p class="error" id="whoErr" hidden></p>
+    <div class="dlg-foot">
+      <button class="ghost" type="button" id="whoCancel" hidden>Cancel</button>
+      <button class="primary" type="submit">Continue</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="pinDlg" aria-labelledby="pinTitle">
+  <form class="dlg" id="pinForm">
+    <h2 id="pinTitle">Switch person</h2>
+    <p id="pinText">Enter the family PIN to switch to someone else.</p>
+    <div class="field">
+      <label for="pinInput">Family PIN</label>
+      <input id="pinInput" type="password" inputmode="numeric" autocomplete="off" minlength="4" maxlength="8" pattern="[0-9]{4,8}" required>
+    </div>
+    <p class="error" id="pinErr" hidden></p>
+    <div class="dlg-foot">
+      <button class="ghost" type="button" id="pinCancel">Cancel</button>
+      <button class="primary" type="submit" id="pinSave">Unlock</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="wishDlg" aria-labelledby="wishTitle">
+  <form class="dlg" id="wishForm">
+    <h2 id="wishTitle">Add a wish</h2>
+    <div class="field">
+      <label for="wFor">Who is it for?</label>
+      <select id="wFor" required></select>
+    </div>
+    <div class="field">
+      <label for="wName">What is it?</label>
+      <input id="wName" required maxlength="80" placeholder="Pour-over coffee set">
+    </div>
+    <div class="field">
+      <label for="wUrl">Link to the item</label>
+      <input id="wUrl" type="url" inputmode="url" placeholder="https://…">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="wAmount">Price</label>
+        <input id="wAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$48">
+      </div>
+      <div class="field">
+        <label for="wPrice">Or a price range</label>
+        <select id="wPrice">
+          <option value="">Not sure</option>
+          <option value="$">Under $25</option>
+          <option value="$$">$25 to $75</option>
+          <option value="$$$">Over $75</option>
+        </select>
+      </div>
+      <div class="field" style="flex:0 1 110px">
+        <label for="wQty">How many</label>
+        <input id="wQty" type="number" inputmode="numeric" min="1" max="20" value="1">
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="wFav"> Mark as most wanted</label>
+    <div class="field">
+      <label for="wNote">Details</label>
+      <textarea id="wNote" maxlength="200" placeholder="Size, color, model…"></textarea>
+    </div>
+    <div class="field">
+      <span class="lbl">Photo</span>
+      <div class="drop" id="drop">
+        <img id="dropImg" alt="" hidden>
+        <span id="dropText">Paste an image, drop one here, or</span>
+        <button type="button" class="linkish" id="pickPhoto">choose a photo</button>
+        <button type="button" class="linkish" id="clearPhoto" hidden>Remove photo</button>
+        <input type="file" id="wPhoto" accept="image/*" hidden>
+      </div>
+      <span class="hint">Leave this empty and we'll try to grab the photo from the link. If that doesn't work, right-click the product image on the store's site, choose Copy Image, and paste it here.</span>
+    </div>
+    <p class="error" id="wishErr" hidden></p>
+    <div class="dlg-foot">
+      <button class="ghost" type="button" id="wishCancel">Cancel</button>
+      <button class="primary" type="submit" id="wishSave">Add to the list</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="confirmDlg" aria-labelledby="confirmTitle">
+  <form class="dlg" method="dialog">
+    <h2 id="confirmTitle">Remove this wish?</h2>
+    <p id="confirmText"></p>
+    <div class="dlg-foot">
+      <button class="ghost" value="no">Keep it</button>
+      <button class="primary" value="yes">Remove</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="shareDlg" aria-labelledby="shareTitle">
+  <form class="dlg" method="dialog">
+    <h2 id="shareTitle">Share this list</h2>
+    <p>Copy this link and text it to anyone. It opens straight to this list.</p>
+    <div class="field">
+      <label for="shareUrl">Link</label>
+      <input id="shareUrl" class="share-url" readonly>
+    </div>
+    <div class="dlg-foot"><button class="primary" value="done">Done</button></div>
+  </form>
+</dialog>
+
+<div class="wrapped" id="wrapped" hidden role="dialog" aria-modal="true" aria-label="Wishlist Wrapped">
+  <div class="story" id="story" data-tone="pine">
+    <div class="bars" id="bars"></div>
+    <button class="story-close" id="storyClose" type="button" aria-label="Close Wishlist Wrapped">&times;</button>
+    <div class="slide" id="slide"></div>
+    <button class="story-nav prev" id="storyPrev" type="button" aria-label="Previous"></button>
+    <button class="story-nav next" id="storyNext" type="button" aria-label="Next"></button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button type="button" id="toastUndo" hidden>Undo</button></div>
+
+<script>
+(() => {
+  // ===================== SETUP =====================
+  // Paste your Google Apps Script web app link (the one ending in /exec) between the quotes.
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz2EMahIUG2ixyMyfzs4_30yRolpS-tQgxzh5QH6btAPxo7yRLwLLYU4raIKxE2TvLJSg/exec';
+  // =================================================
+
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+  };
+  async function api(fn, ...args) {
+    if (!/^https:\/\/script\.google\.com\//.test(API_URL)) throw new Error('This page isn\u2019t connected to the list yet. Paste the web app link into the SETUP line in index.html.');
+    const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }), redirect: 'follow' });
+    const out = await res.json();
+    if (!out.ok) throw new Error(out.error || 'Something went wrong.');
+    return out.data;
+  }
+  const state = {
+    people: [], items: [], pinSet: false, me: store.get('wl.me'), tab: store.get('wl.tab') || 'all',
+    price: 'any', sort: store.get('wl.sort') || 'new', showDone: false,
+    ready: false, editing: null, photo: null, asked: false, busy: false, animating: false
+  };
+  // Personal links: /under-the-tree/sarah is sent here as ?p=sarah by 404.html.
+  const qs = new URLSearchParams(location.search);
+  const BOOT = {
+    slug: (qs.get('p') || location.hash.replace(/^#/, '') || '').toLowerCase().replace(/[^a-z0-9-]/g, ''),
+    base: (location.origin + location.pathname.replace(/[^/]*$/, '')).replace(/\/$/, ''),
+    wrapped: qs.get('wrapped') === 'preview' ? '1' : ''
+  };
+  let slugApplied = false;
+  const PRICES = [['any', 'Any price'], ['$', 'Under $25'], ['$$', '$25 to $75'], ['$$$', 'Over $75']];
+  const TIER_MID = { '$': 15, '$$': 50, '$$$': 120 };
+
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) if (kid != null) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    return el;
+  }
+  const svgEl = (markup, size, extra) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
+    if (extra !== 'filled') { s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', extra || 1.8); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); }
+    s.innerHTML = markup; return s;
+  };
+  const ARROW = '<path d="M7 17L17 7M8 7h9v9"/>';
+  const HOLLY = '<path d="M11 13c-2.2-.3-3.4-2-5.6-1.6.5-1 .2-2.1-.6-2.8 2.2-.2 3.8.8 5.4 2.6.4.6.6 1.2.8 1.8z" fill="#2F6B45"/>' +
+    '<path d="M13 13c2.2-.3 3.4-2 5.6-1.6-.5-1-.2-2.1.6-2.8-2.2-.2-3.8.8-5.4 2.6-.4.6-.6 1.2-.8 1.8z" fill="#3E7F55"/>' +
+    '<circle cx="12" cy="14.6" r="1.9" fill="#A3262A"/><circle cx="9.9" cy="16.2" r="1.6" fill="#B8352F"/><circle cx="14.1" cy="16.2" r="1.6" fill="#8F1F24"/>';
+  const BOW_FILLED = '<path d="M12 12C9 7 3.5 6 3 9s4.5 4.5 9 3z" fill="#F6E7C8" stroke="#C9A24B" stroke-width=".8"/>' +
+    '<path d="M12 12c3-5 8.5-6 9-3s-4.5 4.5-9 3z" fill="#F6E7C8" stroke="#C9A24B" stroke-width=".8"/>' +
+    '<path d="M11.2 12.5 8 19.5l2.2-.6.9 2 1.4-7.5zM12.8 12.5l3.2 7-2.2-.6-.9 2-1.4-7.5z" fill="#EBD6AA" stroke="#C9A24B" stroke-width=".6"/>' +
+    '<circle cx="12" cy="12" r="1.8" fill="#E9CF97" stroke="#C9A24B" stroke-width=".8"/>';
+  const LINK = '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>';
+  const SPEAKER_OFF = '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/>';
+  const SPEAKER_ON = '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';
+  const SPARKLE = '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>';
+  const BOW = '<path d="M12 11c-2.5-3.5-6-4.2-6.5-2.2-.5 2 3 3.2 6.5 2.2zm0 0c2.5-3.5 6-4.2 6.5-2.2.5 2-3 3.2-6.5 2.2zm0 0l-3 7m3-7l3 7"/><circle cx="12" cy="11" r="1.2"/>';
+
+  const safeUrl = (u) => { try { const x = new URL(String(u)); return /^https?:$/.test(x.protocol) ? x.href : null; } catch (e) { return null; } };
+  const safeImg = (s) => (typeof s === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(s)) ? s : null;
+  const safePhotoUrl = (s) => { const u = safeUrl(s); return u && u.startsWith('https://') ? u : null; };
+  const domain = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+  const str = (v, n) => (typeof v === 'string' ? v : '').slice(0, n);
+  const personName = (id) => (state.people.find((p) => p.id === id) || {}).name || 'Someone';
+  const hasMe = () => state.people.some((p) => p.id === state.me);
+  const money = (n) => '$' + (Number.isInteger(n) ? n : n.toFixed(2));
+  const tierOf = (i) => i.amount ? (i.amount < 25 ? '$' : i.amount <= 75 ? '$$' : '$$$') : str(i.price, 3);
+  const priceLabel = (i) => i.amount ? money(i.amount) : ({ '$': 'Under $25', '$$': '$25 to $75', '$$$': 'Over $75' }[tierOf(i)] || '');
+  const priceValue = (i) => i.amount || TIER_MID[tierOf(i)] || null;
+
+  // ---------- countdown ----------
+  function countdown() {
+    const now = new Date(), y = now.getMonth() === 11 && now.getDate() > 25 ? now.getFullYear() + 1 : now.getFullYear();
+    const days = Math.round((new Date(y, 11, 25) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+    const el = $('countdown'); el.replaceChildren();
+    if (days === 0) el.append(h('strong', null, 'Merry Christmas!'));
+    else el.append(h('strong', null, days), days === 1 ? 'day until Christmas' : 'days until Christmas');
+  }
+
+  // ---------- toast ----------
+  let toastTimer;
+  function toast(msg, undo) {
+    const t = $('toast'); $('toastMsg').textContent = msg;
+    const b = $('toastUndo'); b.hidden = !undo; b.onclick = undo ? () => { t.hidden = true; undo(); } : null;
+    t.classList.toggle('has-undo', !!undo); t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), undo ? 6000 : 3200);
+  }
+  const failMsg = (e) => (e && e.message && !/^Exception/.test(e.message) && e.message.length < 120) ? e.message : 'That didn’t save. Check your connection and try again.';
+
+  // ---------- data ----------
+  async function load() {
+    if (state.busy) return;
+    try {
+      const d = await api('getData', state.me || '');
+      state.people = d.people || []; state.items = d.items || []; state.pinSet = !!d.pinSet; state.ready = true;
+      if (!slugApplied) {
+        slugApplied = true;
+        const p = BOOT.slug ? state.people.find((x) => x.slug === BOOT.slug) : null;
+        if (p) {
+          state.tab = p.id;
+          document.title = `${p.name}\u2019s wishlist \u00b7 Under the Tree`;
+          try { history.replaceState(null, '', BOOT.base + '/' + p.slug + (BOOT.wrapped ? '?wrapped=preview' : '')); } catch (e) {}
+        }
+      }
+      if (!state.animating) render();
+      if (!hasMe() && !state.asked) { state.asked = true; openWho(); }
+    } catch (e) {
+      $('status').hidden = false; $('status').textContent = /SETUP/.test((e && e.message) || '') ? e.message : 'The list couldn\u2019t load. Reload the page to try again.';
+    }
+  }
+  async function act(fn, ...args) { state.busy = true; try { return await api(fn, ...args); } finally { state.busy = false; load(); } }
+
+  // ---------- render ----------
+  function render() {
+    const me = hasMe() ? state.me : null;
+    $('whoAv').textContent = me ? personName(me).charAt(0).toUpperCase() : '?';
+    $('whoText').textContent = me ? `Viewing as ${personName(me)} · your gifts stay a surprise` : 'Tell us who you are';
+
+    if (state.tab !== 'all' && !state.people.some((p) => p.id === state.tab)) state.tab = 'all';
+    const counts = {}; state.items.forEach((i) => (counts[i.personId] = (counts[i.personId] || 0) + 1));
+    const tabs = $('tabs'); tabs.replaceChildren();
+    const mk = (id, label, n) => h('button', { class: 'tab', type: 'button', 'aria-pressed': String(state.tab === id), onclick: () => { state.tab = id; store.set('wl.tab', id); render(); } }, label, h('span', { class: 'n' }, n));
+    tabs.append(mk('all', 'Everyone', state.items.length));
+    state.people.forEach((p) => tabs.append(mk(p.id, p.id === me ? `${p.name} (you)` : p.name, counts[p.id] || 0)));
+
+    const chips = $('priceChips'); chips.replaceChildren(...PRICES.map(([v, l]) => h('button', { class: 'chip', type: 'button', 'aria-pressed': String(state.price === v), onclick: () => { state.price = v; render(); } }, l)));
+    $('sortSel').value = state.sort;
+
+    const list = $('list');
+    if (!state.ready) { list.replaceChildren(skeleton()); $('count').textContent = ''; return; }
+
+    const isMine = (i) => !!me && i.personId === me;
+    const isDone = (i) => i.purchased && !isMine(i);
+    let pool = state.items.filter((i) => (state.tab === 'all' || i.personId === state.tab) && (state.price === 'any' || tierOf(i) === state.price));
+    const countable = pool.filter((i) => !isMine(i));
+    $('count').textContent = countable.length ? `${countable.filter((i) => i.purchased).length} of ${countable.length} purchased` : '';
+    const hiddenDone = pool.filter(isDone).length;
+    if (!state.showDone) pool = pool.filter((i) => !isDone(i));
+    pool.sort(sorter(isDone));
+
+    const blocks = [];
+    if (state.tab === 'all') {
+      const order = state.people.filter((p) => p.id !== me).concat(state.people.filter((p) => p.id === me));
+      order.forEach((p) => {
+        const mine = pool.filter((i) => i.personId === p.id);
+        if (!mine.length) return;
+        blocks.push(section(p, mine, isMine, isDone));
+      });
+    } else if (pool.length) {
+      blocks.push(section(state.people.find((p) => p.id === state.tab), pool, isMine, isDone));
+    }
+    if (!blocks.length) blocks.push(emptyState());
+    if (hiddenDone || state.showDone) {
+      blocks.push(h('button', { class: 'ghost more', type: 'button', onclick: () => { state.showDone = !state.showDone; render(); } },
+        state.showDone ? 'Hide purchased gifts' : `Show purchased gifts (${hiddenDone})`));
+    }
+    list.replaceChildren(...blocks);
+  }
+
+  function sorter(isDone) {
+    return (a, b) => {
+      const d = isDone(a) - isDone(b); if (d) return d;
+      if (state.sort === 'fav') { const f = (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0); if (f) return f; }
+      if (state.sort === 'low' || state.sort === 'high') {
+        const pa = priceValue(a), pb = priceValue(b);
+        if (pa == null && pb != null) return 1; if (pb == null && pa != null) return -1;
+        if (pa != null && pb != null && pa !== pb) return state.sort === 'low' ? pa - pb : pb - pa;
+      }
+      return b.createdAt - a.createdAt;
+    };
+  }
+
+  function section(person, items, isMine, isDone) {
+    const grid = h('div', { class: 'grid' }, items.map((i) => card(i, isMine(i), isDone(i))));
+    if (!person) return h('div', { class: 'section' }, grid);
+    const title = person.id === state.me ? 'Your wishes' : person.name;
+    return h('section', { class: 'section' },
+      h('div', { class: 'section-head' }, h('h2', null, title), h('span', null, `${items.length} ${items.length === 1 ? 'wish' : 'wishes'}`),
+        person.slug && BOOT.base ? h('button', { class: 'share-btn', type: 'button', onclick: () => shareLink(person) }, svgEl(LINK, 15, 2), person.id === state.me ? 'Share my list' : 'Share list') : null),
+      grid);
+  }
+  function shareLink(person) {
+    const url = BOOT.base + '/' + person.slug;
+    const fallback = () => { $('shareTitle').textContent = `Share ${person.name}\u2019s list`; $('shareUrl').value = url; $('shareDlg').showModal(); $('shareUrl').select(); };
+    try {
+      navigator.clipboard.writeText(url).then(() => toast(`Link to ${person.name}\u2019s list copied.`), fallback);
+    } catch (e) { fallback(); }
+  }
+  $('shareUrl').addEventListener('focus', (e) => e.target.select());
+
+  function skeleton() {
+    const one = () => h('div', { class: 'skel', 'aria-hidden': 'true' }, h('div', { class: 'sp' }), h('div', { class: 'sl' }), h('div', { class: 'sl short' }));
+    return h('div', { class: 'grid' }, one(), one(), one(), one());
+  }
+
+  function emptyState() {
+    const filtered = state.price !== 'any';
+    const whose = state.tab === 'all' ? null : personName(state.tab);
+    return h('div', { class: 'empty' },
+      h('h2', null, filtered ? 'Nothing in that price range' : whose ? `${whose}’s list is empty` : 'The list is waiting for wishes'),
+      h('p', null, filtered ? 'Try another price range, or show gifts at any price.' : 'Add a gift with a link, and it will show up here for the whole family.'),
+      filtered ? h('button', { class: 'primary', type: 'button', onclick: () => { state.price = 'any'; render(); } }, 'Show any price')
+        : h('button', { class: 'primary', type: 'button', onclick: () => (hasMe() ? openWish() : openWho()) }, hasMe() ? 'Add a wish' : 'Add your name'));
+  }
+
+  function card(item, mine, done) {
+    const url = safeUrl(item.url);
+    const img = safeImg(item.photo) || safePhotoUrl(item.photoUrl);
+    const name = str(item.name, 80);
+    const ph = h('span', { class: 'ph', 'aria-hidden': 'true' }, name.charAt(0).toUpperCase() || '?');
+    const badges = h('div', { class: 'badges' },
+      item.favorite ? h('span', { class: 'badge fav' }, svgEl(HOLLY, 24, 'filled'), 'Most wanted') : null,
+      mine ? h('span', { class: 'badge mine' }, 'Your wish') : null);
+    const inner = [
+      img ? h('img', { src: img, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer', onerror: (e) => e.currentTarget.replaceWith(ph) }) : ph,
+      badges,
+      url ? h('span', { class: 'go', 'aria-hidden': 'true' }, svgEl(ARROW, 18)) : null,
+      done ? h('div', { class: 'paper' }, h('span', { class: 'bow' }, svgEl(BOW_FILLED, 64, 'filled')), h('span', { class: 'paper-label' }, 'Wrapped')) : null
+    ];
+    const photo = url
+      ? h('a', { class: 'photo', href: url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `Shop for ${name}` }, inner)
+      : h('div', { class: 'photo' }, inner);
+
+    let actions;
+    if (mine) actions = h('div', { class: 'actions' },
+      h('button', { class: 'ghost', type: 'button', onclick: () => openWish(item) }, 'Edit'),
+      h('button', { class: 'ghost danger', type: 'button', onclick: () => removeItem(item) }, 'Remove'));
+    else if (done) actions = h('div', { class: 'actions' }, h('button', { class: 'ghost', type: 'button', onclick: () => setPurchased(item, false) }, 'Undo purchased'));
+    else actions = h('div', { class: 'actions' }, h('button', { class: 'primary', type: 'button', onclick: () => setPurchased(item, true) }, 'I got this'));
+
+    const qty = Number(item.quantity) > 1 ? item.quantity : 0;
+    return h('article', { class: 'card', 'data-id': item.id }, photo,
+      h('div', { class: 'body' },
+        h('div', { class: 'meta' }, h('span', null, `For ${personName(item.personId)}`), h('span', null, priceLabel(item))),
+        h('h3', null, name),
+        url ? h('a', { class: 'store', href: url, target: '_blank', rel: 'noopener noreferrer' }, domain(url), svgEl(ARROW, 12, 2)) : null,
+        qty ? h('div', { class: 'qty' }, `Would love ${qty}`) : null,
+        item.note ? h('p', { class: 'note' }, str(item.note, 200)) : null,
+        actions));
+  }
+
+  // ---------- actions ----------
+  async function setPurchased(item, val, quiet) {
+    const call = act('setPurchased', item.id, val, state.me || '');
+    if (val && !quiet) await celebrate(item);
+    item.purchased = val; render();
+    if (val && !quiet) toast(`Wrapped! \u201c${str(item.name, 40)}\u201d is marked purchased.`, () => setPurchased(item, false, true));
+    else if (!val && !quiet) toast('Back on the list.');
+    try { await call; }
+    catch (e) { item.purchased = !val; render(); toast(failMsg(e)); }
+  }
+
+  // ---------- the claim moment ----------
+  const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function celebrate(item) {
+    try { if (navigator.vibrate) navigator.vibrate([18, 40, 28]); } catch (e) {}
+    jingle('short');
+    const el = document.querySelector('article[data-id="' + (window.CSS && CSS.escape ? CSS.escape(item.id) : item.id) + '"]');
+    if (!el || reduceMotion()) return Promise.resolve();
+    state.animating = true;
+    el.classList.add('claiming');
+    el.querySelector('.photo').append(h('div', { class: 'paper wrapping', 'aria-hidden': 'true' },
+      h('span', { class: 'bow' }, svgEl(BOW_FILLED, 64, 'filled')), h('span', { class: 'paper-label' }, 'Wrapped')));
+    confetti(el);
+    return new Promise((resolve) => setTimeout(() => { state.animating = false; resolve(); }, 1600));
+  }
+  function confetti(el) {
+    const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.width * 0.45;
+    const layer = h('div', { class: 'confetti', 'aria-hidden': 'true' }); document.body.append(layer);
+    const colors = ['#A3262A', '#C9A24B', '#2F6B45', '#F3D9A4', '#E8B4B8'];
+    for (let i = 0; i < 40; i++) {
+      const bit = h('i'); bit.style.background = colors[i % colors.length]; bit.style.left = cx + 'px'; bit.style.top = cy + 'px';
+      if (i % 3 === 0) bit.style.borderRadius = '50%';
+      layer.append(bit);
+      const a = Math.random() * Math.PI * 2, dist = 70 + Math.random() * 150;
+      const dx = Math.cos(a) * dist, dy = Math.sin(a) * dist - 70;
+      if (bit.animate) bit.animate([
+        { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 140}px)) rotate(${Math.random() * 720 - 360}deg)`, opacity: 0 }
+      ], { duration: 1100 + Math.random() * 600, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+    }
+    setTimeout(() => layer.remove(), 1900);
+  }
+
+  // ---------- optional sound (off by default) ----------
+  let sound = store.get('wl.sound') === 'on', actx = null;
+  function paintSound() {
+    const b = $('soundBtn');
+    b.setAttribute('aria-pressed', String(sound));
+    b.replaceChildren(svgEl(sound ? SPEAKER_ON : SPEAKER_OFF, 18), sound ? 'Sound on' : 'Sound off');
+  }
+  $('soundBtn').onclick = () => { sound = !sound; store.set('wl.sound', sound ? 'on' : 'off'); paintSound(); if (sound) jingle('short'); };
+  function jingle(kind) {
+    if (!sound) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const E = 659.25, G = 783.99, C = 523.25, D = 587.33;
+      const seq = kind === 'long'
+        ? [[E, 0, .16], [E, .2, .16], [E, .4, .36], [E, .85, .16], [E, 1.05, .16], [E, 1.25, .36], [E, 1.7, .16], [G, 1.9, .16], [C, 2.1, .24], [D, 2.38, .1], [E, 2.52, .6]]
+        : [[E, 0, .14], [E, .17, .14], [E, .34, .4]];
+      const t0 = actx.currentTime + 0.03;
+      seq.forEach(([f, at, len]) => bell(f, t0 + at, len));
+      sleigh(t0, kind === 'long' ? 3 : 0.8);
+    } catch (e) {}
+  }
+  function bell(f, t, len) {
+    [[1, 0.07], [2.76, 0.02], [5.4, 0.008]].forEach(([m, g]) => {
+      const o = actx.createOscillator(), v = actx.createGain();
+      o.type = 'sine'; o.frequency.value = f * m;
+      v.gain.setValueAtTime(0.0001, t); v.gain.exponentialRampToValueAtTime(g, t + 0.01); v.gain.exponentialRampToValueAtTime(0.0001, t + len + 0.5);
+      o.connect(v); v.connect(actx.destination); o.start(t); o.stop(t + len + 0.6);
+    });
+  }
+  function sleigh(t, dur) {
+    const buf = actx.createBuffer(1, Math.floor(actx.sampleRate * 0.05), actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    for (let k = 0; k < Math.floor(dur / 0.11); k++) {
+      const src = actx.createBufferSource(), bp = actx.createBiquadFilter(), g = actx.createGain();
+      src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = 7000 + Math.random() * 2500; bp.Q.value = 2; g.gain.value = 0.03;
+      src.connect(bp); bp.connect(g); g.connect(actx.destination); src.start(t + k * 0.11 + Math.random() * 0.02);
+    }
+  }
+
+  // ---------- Wishlist Wrapped ----------
+  const wrappedSeason = () => { const n = new Date(); return (n.getMonth() === 11 && n.getDate() >= 25) || n.getMonth() === 0; };
+  if (wrappedSeason() || BOOT.wrapped === '1') $('wrappedBtn').hidden = false;
+  $('wrappedBtn').replaceChildren(svgEl(SPARKLE, 18, 2), wrappedSeason() ? 'Open Wishlist Wrapped' : 'Preview Wishlist Wrapped');
+  $('wrappedBtn').onclick = () => { if (wrappedSeason()) openWrapped(''); else openPin('wrapped'); };
+  let slides = [], slideAt = 0;
+  async function openWrapped(pin) {
+    try {
+      const w = await api('getWrapped', pin);
+      slides = buildSlides(w); slideAt = 0; showSlide();
+      $('wrapped').hidden = false; $('storyClose').focus(); jingle('long');
+    } catch (e) { toast(failMsg(e)); }
+  }
+  function buildSlides(w) {
+    const k = (t) => h('div', { class: 'kick' }, t), big = (t) => h('div', { class: 'big' }, t), mid = (t) => h('div', { class: 'mid' }, t), para = (t) => h('p', null, t);
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const dur = (hrs) => hrs < 24 ? plural(hrs, 'hour', 'hours') : plural(Math.round(hrs / 24), 'day', 'days');
+    const out = [{ tone: 'pine', body: [k(`Wishlist Wrapped \u00b7 ${w.year}`), big(`${w.wishes} wishes.`), mid(`${w.claimed} wrapped.`), para(`${plural(w.people, 'person', 'people')}, one list. Here\u2019s how Christmas went.`)] }];
+    if (w.fastest) {
+      const src = safeImg(w.fastest.photo) || safePhotoUrl(w.fastest.photo);
+      out.push({ tone: 'paper', body: [k(w.fastest.wasFavorite ? 'Most wanted, snapped up fastest' : 'Snapped up fastest'),
+        src ? h('div', { class: 'pic' }, h('img', { src, alt: '', referrerpolicy: 'no-referrer' })) : null,
+        mid(w.fastest.gift), para(`For ${w.fastest.forName}. Claimed just ${dur(w.fastest.hours)} after it went on the list.`)] });
+    }
+    if (w.earliest) out.push({ tone: 'holly', body: [k('Earliest elf'), big(w.earliest.name), para(`was first to shop, all the way back on ${w.earliest.date}.`)] });
+    if (w.elf) out.push({ tone: 'gold', body: [k('Busiest elf'), big(w.elf.name), para(`claimed ${plural(w.elf.count, 'gift', 'gifts')} this year.`)] });
+    if (w.store) out.push({ tone: 'pine', body: [k('Top store'), mid(w.store.name), para(`${plural(w.store.count, 'wish', 'wishes')} came from here.`)] });
+    if (w.biggest) out.push({ tone: 'paper', body: [k('Biggest wishlist'), big(w.biggest.name), para(`dreamed up ${plural(w.biggest.count, 'wish', 'wishes')}.`)] });
+    out.push({ tone: 'holly', body: [big('Merry Christmas.'), para('Thanks for making it a good one. Same time next year?')] });
+    return out;
+  }
+  function showSlide() {
+    const s = slides[slideAt];
+    $('story').dataset.tone = s.tone;
+    $('bars').replaceChildren(...slides.map((_, i) => h('i', { class: i <= slideAt ? 'on' : '' })));
+    const slide = h('div', { class: 'slide', id: 'slide' }, s.body, h('div', { class: 'foot' }, h('span', null, 'Under the Tree'), h('span', null, `${slideAt + 1} / ${slides.length}`)));
+    $('slide').replaceWith(slide);
+  }
+  const step = (d) => { const n = slideAt + d; if (n < 0) return; if (n >= slides.length) return closeWrapped(); slideAt = n; showSlide(); };
+  function closeWrapped() { $('wrapped').hidden = true; }
+  $('storyNext').onclick = () => step(1);
+  $('storyPrev').onclick = () => step(-1);
+  $('storyClose').onclick = closeWrapped;
+  document.addEventListener('keydown', (e) => {
+    if ($('wrapped').hidden) return;
+    if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); else if (e.key === 'Escape') closeWrapped();
+  });
+  function removeItem(item) {
+    $('confirmText').textContent = `“${str(item.name, 80)}” will be taken off the list for everyone.`;
+    const dlg = $('confirmDlg');
+    dlg.onclose = async () => {
+      if (dlg.returnValue !== 'yes') return;
+      try { await act('deleteItem', item.id); toast('Wish removed.'); } catch (e) { toast(failMsg(e)); }
+    };
+    dlg.returnValue = ''; dlg.showModal();
+  }
+  $('sortSel').onchange = (e) => { state.sort = e.target.value; store.set('wl.sort', state.sort); render(); };
+
+  // ---------- name lock + family PIN ----------
+  let pinMode = 'switch';
+  function openPin(mode) {
+    pinMode = mode || 'switch';
+    $('pinInput').value = ''; $('pinErr').hidden = true;
+    $('pinTitle').textContent = pinMode === 'wrapped' ? 'Preview Wishlist Wrapped' : 'Switch person';
+    $('pinText').textContent = pinMode === 'wrapped'
+      ? 'Wrapped opens for everyone on Christmas Day. Enter the family PIN to peek early. It shows who bought what, so keep it to yourself!'
+      : 'This device is set to ' + personName(state.me) + '. Enter the family PIN to switch to someone else.';
+    $('pinSave').textContent = pinMode === 'wrapped' ? 'Open' : 'Unlock';
+    $('pinDlg').showModal();
+  }
+  $('pinCancel').onclick = () => $('pinDlg').close();
+  $('pinForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const pin = $('pinInput').value.trim(), err = $('pinErr'); err.hidden = true;
+    $('pinSave').disabled = true;
+    try {
+      if (pinMode === 'wrapped') {
+        if (await api('checkPin', pin)) { $('pinDlg').close(); openWrapped(pin); }
+        else { err.textContent = 'That PIN isn\u2019t right. Try again.'; err.hidden = false; }
+      } else if (await api('checkPin', pin)) { $('pinDlg').close(); openWho(); }
+      else { err.textContent = 'That PIN isn’t right. Try again.'; err.hidden = false; }
+    } catch (e) { err.textContent = 'Couldn’t check the PIN. Try again.'; err.hidden = false; }
+    finally { $('pinSave').disabled = false; }
+  });
+  $('whoChip').onclick = () => {
+    if (!hasMe()) return openWho();
+    if (!state.pinSet) return toast('Switching names needs a family PIN. Ask Sarah to add one.');
+    openPin('switch');
+  };
+
+  // ---------- who dialog ----------
+  let whoPick = null;
+  function openWho() {
+    if ($('whoDlg').open) return;
+    whoPick = state.me; $('newPerson').value = ''; $('whoErr').hidden = true;
+    $('whoCancel').hidden = !hasMe();
+    const box = $('whoPeople'); box.replaceChildren();
+    state.people.forEach((p) => box.append(h('button', { type: 'button', 'aria-pressed': String(whoPick === p.id), onclick: (ev) => { whoPick = p.id; $('newPerson').value = ''; box.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === ev.currentTarget))); } }, p.name)));
+    $('whoDlg').showModal();
+  }
+  $('whoCancel').onclick = () => $('whoDlg').close();
+  $('whoDlg').addEventListener('cancel', (e) => { if (!hasMe()) e.preventDefault(); });
+  $('whoForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const name = $('newPerson').value.trim();
+    try {
+      if (name) whoPick = await act('addPerson', name);
+      if (!whoPick) { $('whoErr').textContent = 'Pick your name or type it in.'; $('whoErr').hidden = false; return; }
+      state.me = whoPick; store.set('wl.me', whoPick); $('whoDlg').close(); load();
+    } catch (e) { $('whoErr').textContent = failMsg(e); $('whoErr').hidden = false; }
+  });
+
+  // ---------- wish dialog ----------
+  function setPhoto(dataUrl) {
+    state.photo = dataUrl || null;
+    $('dropImg').hidden = !state.photo; if (state.photo) $('dropImg').src = state.photo; else $('dropImg').removeAttribute('src');
+    $('dropText').hidden = !!state.photo; $('pickPhoto').textContent = state.photo ? 'Choose a different photo' : 'choose a photo'; $('clearPhoto').hidden = !state.photo;
+  }
+  function openWish(item) {
+    if (!hasMe()) return openWho();
+    state.editing = item || null;
+    const sel = $('wFor'); sel.replaceChildren(...state.people.map((p) => h('option', { value: p.id }, p.name)));
+    sel.value = item ? item.personId : (state.tab !== 'all' ? state.tab : state.me);
+    $('wName').value = item ? str(item.name, 80) : ''; $('wUrl').value = item ? (safeUrl(item.url) || '') : '';
+    $('wAmount').value = item && item.amount ? item.amount : ''; $('wPrice').value = item && !item.amount ? str(item.price, 3) : '';
+    $('wQty').value = item ? (item.quantity || 1) : 1; $('wFav').checked = !!(item && item.favorite);
+    $('wNote').value = item ? str(item.note, 200) : '';
+    setPhoto(item ? safeImg(item.photo) : null);
+    $('wishTitle').textContent = item ? 'Edit wish' : 'Add a wish'; $('wishSave').textContent = item ? 'Save changes' : 'Add to the list';
+    $('wishErr').hidden = true; $('wishDlg').showModal();
+  }
+  $('addBtn').onclick = () => openWish();
+  $('wishCancel').onclick = () => $('wishDlg').close();
+  $('pickPhoto').onclick = () => $('wPhoto').click();
+  $('clearPhoto').onclick = () => setPhoto(null);
+  $('wPhoto').onchange = (e) => { const f = e.target.files[0]; if (f) loadImage(f); e.target.value = ''; };
+  const drop = $('drop');
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); const f = [...((e.dataTransfer && e.dataTransfer.files) || [])].find((x) => x.type.startsWith('image/')); if (f) loadImage(f); });
+  $('wishDlg').addEventListener('paste', (e) => {
+    const it = [...((e.clipboardData && e.clipboardData.items) || [])].find((x) => x.type.startsWith('image/'));
+    const f = it && it.getAsFile(); if (f) { e.preventDefault(); loadImage(f); }
+  });
+  // A spreadsheet cell holds up to 50,000 characters, so photos are shrunk to fit.
+  function loadImage(file) {
+    const url = URL.createObjectURL(file); const im = new Image();
+    im.onload = () => {
+      let max = 440, out = '';
+      while (max >= 200) {
+        const r = Math.min(1, max / Math.max(im.width, im.height));
+        const c = document.createElement('canvas'); c.width = Math.round(im.width * r); c.height = Math.round(im.height * r);
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(im, 0, 0, c.width, c.height);
+        for (let q = 0.78; q >= 0.4; q -= 0.08) { out = c.toDataURL('image/jpeg', q); if (out.length < 45000) break; }
+        if (out.length < 45000) break;
+        max -= 80;
+      }
+      URL.revokeObjectURL(url);
+      if (out.length < 45000) setPhoto(out); else toast('That photo is too detailed to save. Try a different one.');
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); toast('That file isn’t an image we can read.'); };
+    im.src = url;
+  }
+  $('wishForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = $('wishErr'); err.hidden = true;
+    const rawUrl = $('wUrl').value.trim();
+    const url = rawUrl ? safeUrl(rawUrl) : '';
+    if (rawUrl && !url) { err.textContent = 'The link should start with https://'; err.hidden = false; return; }
+    const amount = parseFloat($('wAmount').value);
+    const data = {
+      id: state.editing ? state.editing.id : '', personId: $('wFor').value, name: $('wName').value.trim(), url: url || '',
+      price: $('wPrice').value, amount: amount > 0 ? amount : '', quantity: parseInt($('wQty').value, 10) || 1,
+      favorite: $('wFav').checked, note: $('wNote').value.trim(), photo: state.photo || ''
+    };
+    if (!data.name) { err.textContent = 'Give the gift a name.'; err.hidden = false; return; }
+    $('wishSave').disabled = true; $('wishSave').textContent = data.url && !data.photo ? 'Finding the photo…' : 'Saving…';
+    try {
+      const res = await act('saveItem', data);
+      $('wishDlg').close();
+      toast(state.editing ? 'Wish updated.' : (res && res.autoPhoto ? 'Added, with the photo from the link.' : (data.url && !data.photo ? 'Added. We couldn’t grab a photo from that store, so you can paste one with Edit.' : 'Added to the list.')));
+    } catch (e) { err.textContent = failMsg(e); err.hidden = false; }
+    finally { $('wishSave').disabled = false; $('wishSave').textContent = state.editing ? 'Save changes' : 'Add to the list'; }
+  });
+
+  // ---------- start ----------
+  countdown(); paintSound(); render(); load();
+  setInterval(() => { if (document.visibilityState === 'visible') load(); }, 20000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { countdown(); load(); } });
+})();
+</script>
+</body>
+</html>

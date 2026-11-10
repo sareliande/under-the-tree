@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under the Tree</title>
+<meta name="description" content="Our family Christmas wishlist. Find a gift, shop it, and mark it purchased so nobody doubles up.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Under the Tree">
+<meta property="og:description" content="Our family Christmas wishlist. Find a gift, shop it, and mark it purchased so nobody doubles up.">
+<meta property="og:image" content="preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/under-the-tree/icon.png">
+<link rel="apple-touch-icon" href="/under-the-tree/icon.png">
+<meta name="theme-color" content="#F3ECDF">
+<script>
+  // Turns a personal link like /under-the-tree/sarah into /under-the-tree/?p=sarah
+  (function () {
+    var seg = location.pathname.split('/').filter(Boolean);
+    var onGitHub = /\.github\.io$/.test(location.hostname);
+    var base = onGitHub && seg.length ? '/' + seg[0] + '/' : '/';
+    var slug = (onGitHub ? seg[1] : seg[0]) || '';
+    location.replace(base + (slug ? '?p=' + encodeURIComponent(slug) : '') + location.hash);
+  })();
+</script>
+</head>
+<body style="background:#F3ECDF"></body>
+</html>
