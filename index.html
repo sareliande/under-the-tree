@@ -135,6 +135,7 @@ dialog::backdrop { background: rgba(20,30,22,0.55); }
 .drop { border: 1.5px dashed var(--line); border-radius: 14px; min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px; text-align: center; color: var(--muted); font-size: 14px; background: var(--pad); }
 .drop.over { border-color: var(--gold-bright); }
 .drop img { max-height: 170px; max-width: 100%; border-radius: 10px; }
+.field .or-link { margin-top: 6px; }
 .linkish { background: none; border: 0; color: var(--ink); text-decoration: underline; padding: 4px; min-height: 32px; font-weight: 600; }
 .people { display: flex; flex-wrap: wrap; gap: 8px; }
 .people button { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--pad); font-weight: 500; }
@@ -350,13 +351,16 @@ h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: dr
     <div class="field">
       <span class="lbl">Photo</span>
       <div class="drop" id="drop">
-        <img id="dropImg" alt="" hidden>
+        <img id="dropImg" alt="" referrerpolicy="no-referrer" hidden>
         <span id="dropText">Paste an image, drop one here, or</span>
         <button type="button" class="linkish" id="pickPhoto">choose a photo</button>
         <button type="button" class="linkish" id="clearPhoto" hidden>Remove photo</button>
         <input type="file" id="wPhoto" accept="image/*" hidden>
       </div>
-      <span class="hint">Leave this empty and we'll try to grab the photo from the link. If that doesn't work, right-click the product image on the store's site, choose Copy Image, and paste it here.</span>
+      <label for="wPhotoUrl" class="or-link">Or paste a link to a picture</label>
+      <input id="wPhotoUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://…">
+      <span class="error" id="photoLinkErr" hidden></span>
+      <span class="hint">Leave both empty and we'll try to grab the photo from the gift's link. To use a picture from a website, right-click it, choose Copy Image Address (or Copy Image Link), and paste it in the box above.</span>
     </div>
     <p class="error" id="wishErr" hidden></p>
     <div class="dlg-foot">
@@ -423,7 +427,7 @@ h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: dr
   const state = {
     people: [], items: [], pinSet: false, me: store.get('wl.me'), tab: store.get('wl.tab') || 'all',
     price: 'any', sort: store.get('wl.sort') || 'new', showDone: false,
-    ready: false, editing: null, photo: null, asked: false, busy: false, animating: false
+    ready: false, editing: null, photo: null, photoLink: '', linkBad: false, asked: false, busy: false, animating: false
   };
   // Personal links: /under-the-tree/sarah is sent here as ?p=sarah by 404.html.
   const qs = new URLSearchParams(location.search);
@@ -846,10 +850,27 @@ h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: dr
   });
 
   // ---------- wish dialog ----------
+  // A wish's picture is either an uploaded photo (saved in the sheet) or a link to a picture online.
+  function paintPhoto() {
+    const src = state.photo || state.photoLink;
+    $('dropImg').hidden = !src; if (src) $('dropImg').src = src; else $('dropImg').removeAttribute('src');
+    $('dropText').hidden = !!src; $('pickPhoto').textContent = src ? 'Choose a different photo' : 'choose a photo'; $('clearPhoto').hidden = !src;
+  }
   function setPhoto(dataUrl) {
     state.photo = dataUrl || null;
-    $('dropImg').hidden = !state.photo; if (state.photo) $('dropImg').src = state.photo; else $('dropImg').removeAttribute('src');
-    $('dropText').hidden = !!state.photo; $('pickPhoto').textContent = state.photo ? 'Choose a different photo' : 'choose a photo'; $('clearPhoto').hidden = !state.photo;
+    if (state.photo) { state.photoLink = ''; state.linkBad = false; $('wPhotoUrl').value = ''; $('photoLinkErr').hidden = true; }
+    paintPhoto();
+  }
+  function setPhotoLink(raw) {
+    const v = String(raw || '').trim(); const err = $('photoLinkErr');
+    state.linkBad = false; err.hidden = true;
+    if (!v) { state.photoLink = ''; paintPhoto(); return; }
+    const u = safePhotoUrl(v);
+    if (!u) { state.photoLink = ''; state.linkBad = true; err.textContent = 'The picture link should start with https://'; err.hidden = false; paintPhoto(); return; }
+    state.photo = null; state.photoLink = u; paintPhoto();
+    const probe = new Image(); probe.referrerPolicy = 'no-referrer';
+    probe.onerror = () => { if (state.photoLink !== u) return; state.linkBad = true; err.textContent = 'We couldn’t load a picture from that link. Copy the image address again, or upload the picture instead.'; err.hidden = false; $('dropImg').hidden = true; $('dropText').hidden = false; };
+    probe.src = u;
   }
   function openWish(item) {
     if (!hasMe()) return openWho();
@@ -860,14 +881,18 @@ h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: dr
     $('wAmount').value = item && item.amount ? item.amount : ''; $('wPrice').value = item && !item.amount ? str(item.price, 3) : '';
     $('wQty').value = item ? (item.quantity || 1) : 1; $('wFav').checked = !!(item && item.favorite);
     $('wNote').value = item ? str(item.note, 200) : '';
+    const linked = item && !safeImg(item.photo) ? (safePhotoUrl(item.photoUrl) || '') : '';
+    $('wPhotoUrl').value = linked; state.photoLink = ''; state.linkBad = false; $('photoLinkErr').hidden = true;
     setPhoto(item ? safeImg(item.photo) : null);
+    if (linked) setPhotoLink(linked);
     $('wishTitle').textContent = item ? 'Edit wish' : 'Add a wish'; $('wishSave').textContent = item ? 'Save changes' : 'Add to the list';
     $('wishErr').hidden = true; $('wishDlg').showModal();
   }
   $('addBtn').onclick = () => openWish();
   $('wishCancel').onclick = () => $('wishDlg').close();
   $('pickPhoto').onclick = () => $('wPhoto').click();
-  $('clearPhoto').onclick = () => setPhoto(null);
+  $('clearPhoto').onclick = () => { $('wPhotoUrl').value = ''; setPhotoLink(''); setPhoto(null); };
+  $('wPhotoUrl').addEventListener('input', (e) => setPhotoLink(e.target.value));
   $('wPhoto').onchange = (e) => { const f = e.target.files[0]; if (f) loadImage(f); e.target.value = ''; };
   const drop = $('drop');
   drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
@@ -906,14 +931,16 @@ h1.titled .title-bow svg { width: 100%; height: 100%; display: block; filter: dr
     const data = {
       id: state.editing ? state.editing.id : '', personId: $('wFor').value, name: $('wName').value.trim(), url: url || '',
       price: $('wPrice').value, amount: amount > 0 ? amount : '', quantity: parseInt($('wQty').value, 10) || 1,
-      favorite: $('wFav').checked, note: $('wNote').value.trim(), photo: state.photo || ''
+      favorite: $('wFav').checked, note: $('wNote').value.trim(), photo: state.photo || '',
+      photoUrl: state.photo ? '' : (state.photoLink || '')
     };
+    if (!state.photo && state.linkBad) { err.textContent = $('photoLinkErr').textContent || 'Check the picture link.'; err.hidden = false; return; }
     if (!data.name) { err.textContent = 'Give the gift a name.'; err.hidden = false; return; }
-    $('wishSave').disabled = true; $('wishSave').textContent = data.url && !data.photo ? 'Finding the photo…' : 'Saving…';
+    $('wishSave').disabled = true; $('wishSave').textContent = data.url && !data.photo && !data.photoUrl ? 'Finding the photo…' : 'Saving…';
     try {
       const res = await act('saveItem', data);
       $('wishDlg').close();
-      toast(state.editing ? 'Wish updated.' : (res && res.autoPhoto ? 'Added, with the photo from the link.' : (data.url && !data.photo ? 'Added. We couldn’t grab a photo from that store, so you can paste one with Edit.' : 'Added to the list.')));
+      toast(state.editing ? 'Wish updated.' : (res && res.autoPhoto ? 'Added, with the photo from the link.' : (data.url && !data.photo && !data.photoUrl ? 'Added. We couldn’t grab a photo from that store, so you can paste one with Edit.' : 'Added to the list.')));
     } catch (e) { err.textContent = failMsg(e); err.hidden = false; }
     finally { $('wishSave').disabled = false; $('wishSave').textContent = state.editing ? 'Save changes' : 'Add to the list'; }
   });
